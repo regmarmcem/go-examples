@@ -15,12 +15,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = cmd.Wait()
-	if err != nil {
-		panic(err)
-	}
-	state := cmd.ProcessState
-	fmt.Printf(" Pid: %d\n", state.Pid())
-	fmt.Printf(" System: %d\n", state.SystemTime())
-	fmt.Printf(" User: %d\n", state.UserTime())
+	fmt.Printf(" Process: %d\n", cmd.Process)
 }
