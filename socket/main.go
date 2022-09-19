@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -64,7 +65,8 @@ func child() {
 	if childfd != nil {
 		defer childfd.Close()
 		childfd.Read(buf)
-		fmt.Println(string(buf))
+		s := strings.ToUpper(string(buf))
+		fmt.Println(s)
 		os.Exit(0)
 	} else {
 		os.Exit(1)
