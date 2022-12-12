@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -47,7 +49,12 @@ func parent() (err error) {
 	cmd.Stderr = os.Stderr
 
 	data := []byte("test")
-	parentFd.Write(data)
+	r := bytes.NewReader(data)
+	// parentFd.Write(data)
+
+	if _, err := io.Copy(parentFd, r); err != nil {
+		fmt.Printf("[parent] error in io.Copy %v\n", err)
+	}
 	var test []byte
 	test, err = cmd.Output()
 	if err != nil {
@@ -55,6 +62,11 @@ func parent() (err error) {
 		return err
 	}
 	fmt.Println(string(test))
+	buf := make([]byte, 4)
+	parentFd.Read(buf)
+	s := strings.ToLower(string(buf))
+	fmt.Printf("[parent] buf is %s", s)
+
 	return nil
 }
 
@@ -66,7 +78,9 @@ func child() {
 		defer childfd.Close()
 		childfd.Read(buf)
 		s := strings.ToUpper(string(buf))
-		fmt.Println(s)
+		fmt.Printf("[child] buf is %s", s)
+		r := bytes.NewReader(buf)
+		io.Copy(childfd, r)
 		os.Exit(0)
 	} else {
 		os.Exit(1)
